@@ -13,8 +13,8 @@ public class TaskService {
 
     private final TaskRepository repository;
 
-    public TaskService(TaskRepository respository) {
-        this.repository = respository;
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
     }
 
     private TaskResponse toResponse(TaskModel task) {
