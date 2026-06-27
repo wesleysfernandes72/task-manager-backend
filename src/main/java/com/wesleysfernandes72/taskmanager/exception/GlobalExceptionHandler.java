@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
         ValidationErrorResponse response = new ValidationErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_GATEWAY.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "Validation failed",
                 request.getRequestURI(),
                 errors
