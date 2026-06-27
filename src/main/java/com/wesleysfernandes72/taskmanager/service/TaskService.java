@@ -3,6 +3,7 @@ package com.wesleysfernandes72.taskmanager.service;
 import com.wesleysfernandes72.taskmanager.dto.TaskRequest;
 import com.wesleysfernandes72.taskmanager.dto.TaskResponse;
 import com.wesleysfernandes72.taskmanager.dto.TaskSearchRequest;
+import com.wesleysfernandes72.taskmanager.exception.TaskNotFoundException;
 import com.wesleysfernandes72.taskmanager.model.TaskModel;
 import com.wesleysfernandes72.taskmanager.repository.TaskRepository;
 import com.wesleysfernandes72.taskmanager.specification.TaskSpecification;
@@ -49,14 +50,14 @@ public class TaskService {
 
     public TaskResponse findById(Long id) {
         TaskModel task = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
         return toResponse(task);
     }
 
     public TaskResponse update(Long id, TaskRequest dto) {
         TaskModel task = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
         task.setTitle(dto.title());
         task.setStatus(dto.status());
@@ -67,7 +68,7 @@ public class TaskService {
 
     public void delete(Long id) {
         TaskModel task = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(id));
 
         repository.delete(task);
     }
