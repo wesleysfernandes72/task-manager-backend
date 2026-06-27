@@ -2,8 +2,10 @@ package com.wesleysfernandes72.taskmanager.service;
 
 import com.wesleysfernandes72.taskmanager.dto.TaskRequest;
 import com.wesleysfernandes72.taskmanager.dto.TaskResponse;
+import com.wesleysfernandes72.taskmanager.dto.TaskSearchRequest;
 import com.wesleysfernandes72.taskmanager.model.TaskModel;
 import com.wesleysfernandes72.taskmanager.repository.TaskRepository;
+import com.wesleysfernandes72.taskmanager.specification.TaskSpecification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,8 +40,8 @@ public class TaskService {
         return toResponse(saved);
     }
 
-    public List<TaskResponse> findAll() {
-        return repository.findAll()
+    public List<TaskResponse> findAll(TaskSearchRequest request) {
+        return repository.findAll(TaskSpecification.byFilter(request))
                 .stream()
                 .map(this::toResponse)
                 .toList();

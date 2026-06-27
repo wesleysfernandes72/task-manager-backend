@@ -3,6 +3,7 @@ package com.wesleysfernandes72.taskmanager.controller;
 
 import com.wesleysfernandes72.taskmanager.dto.TaskRequest;
 import com.wesleysfernandes72.taskmanager.dto.TaskResponse;
+import com.wesleysfernandes72.taskmanager.dto.TaskSearchRequest;
 import com.wesleysfernandes72.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/tasks")
 public class TaskController {
 
@@ -27,8 +29,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<TaskResponse>> findAll(@Valid TaskSearchRequest request) {
+        return ResponseEntity.ok(service.findAll(request));
     }
 
     @GetMapping("/{id}")
