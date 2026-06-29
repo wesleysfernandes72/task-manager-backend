@@ -4,6 +4,7 @@ import com.wesleysfernandes72.taskmanager.dto.TaskRequest;
 import com.wesleysfernandes72.taskmanager.dto.TaskResponse;
 import com.wesleysfernandes72.taskmanager.dto.TaskSearchRequest;
 import com.wesleysfernandes72.taskmanager.exception.TaskNotFoundException;
+import com.wesleysfernandes72.taskmanager.mapper.TaskMapper;
 import com.wesleysfernandes72.taskmanager.model.TaskModel;
 import com.wesleysfernandes72.taskmanager.repository.TaskRepository;
 import com.wesleysfernandes72.taskmanager.specification.TaskSpecification;
@@ -12,32 +13,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
-
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
     private final TaskRepository repository;
+    private final TaskMapper mapper;
 
-    private TaskResponse toResponse(TaskModel task) {
-        return new TaskResponse(
-                task.getId(),
-                task.getTitle(),
-                task.getStatus(),
-                task.getPriority(),
-                task.getCreatedAt()
-        );
-    }
+    public TaskResponse create(TaskRequest request) {
 
-    public TaskResponse create(TaskRequest dto) {
-        TaskModel task = new TaskModel();
-        task.setTitle(dto.title());
-        task.setStatus(dto.status());
-        task.setPriority(dto.priority());
+        TaskModel task = mapper.toEntity(request);
 
         TaskModel saved = repository.save(task);
 
-        return toResponse(saved);
+        return mapper.toResponse(saved);
     }
 
     public Page<TaskResponse> findAll(
@@ -47,28 +36,31 @@ public class TaskService {
 
         return repository
                 .findAll(TaskSpecification.byFilter(request), pageable)
-                .map(this::toResponse);
+                .map(mapper::toResponse);
     }
 
     public TaskResponse findById(Long id) {
+
         TaskModel task = repository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
-        return toResponse(task);
+        return mapper.toResponse(task);
     }
 
-    public TaskResponse update(Long id, TaskRequest dto) {
+    public TaskResponse update(Long id, TaskRequest request) {
+
         TaskModel task = repository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
-        task.setTitle(dto.title());
-        task.setStatus(dto.status());
-        task.setPriority(dto.priority());
+        mapper.update(request, task);
 
-        return toResponse(repository.save(task));
+        TaskModel updated = repository.save(task);
+
+        return mapper.toResponse(updated);
     }
 
     public void delete(Long id) {
+
         TaskModel task = repository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
 
