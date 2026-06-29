@@ -6,21 +6,21 @@ import com.wesleysfernandes72.taskmanager.dto.TaskResponse;
 import com.wesleysfernandes72.taskmanager.dto.TaskSearchRequest;
 import com.wesleysfernandes72.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService service;
-
-    public TaskController(TaskService service) {
-        this.service = service;
-    }
 
     @PostMapping
     public ResponseEntity<TaskResponse> create(@RequestBody @Valid TaskRequest request) {
@@ -29,8 +29,13 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> findAll(@Valid TaskSearchRequest request) {
-        return ResponseEntity.ok(service.findAll(request));
+    public ResponseEntity<Page<TaskResponse>> findAll(
+            @Valid TaskSearchRequest request,
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                service.findAll(request, pageable)
+        );
     }
 
     @GetMapping("/{id}")

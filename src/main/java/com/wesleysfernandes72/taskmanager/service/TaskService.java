@@ -7,18 +7,17 @@ import com.wesleysfernandes72.taskmanager.exception.TaskNotFoundException;
 import com.wesleysfernandes72.taskmanager.model.TaskModel;
 import com.wesleysfernandes72.taskmanager.repository.TaskRepository;
 import com.wesleysfernandes72.taskmanager.specification.TaskSpecification;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+@RequiredArgsConstructor
 
 @Service
 public class TaskService {
 
     private final TaskRepository repository;
-
-    public TaskService(TaskRepository repository) {
-        this.repository = repository;
-    }
 
     private TaskResponse toResponse(TaskModel task) {
         return new TaskResponse(
@@ -41,11 +40,14 @@ public class TaskService {
         return toResponse(saved);
     }
 
-    public List<TaskResponse> findAll(TaskSearchRequest request) {
-        return repository.findAll(TaskSpecification.byFilter(request))
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<TaskResponse> findAll(
+            TaskSearchRequest request,
+            Pageable pageable
+    ) {
+
+        return repository
+                .findAll(TaskSpecification.byFilter(request), pageable)
+                .map(this::toResponse);
     }
 
     public TaskResponse findById(Long id) {

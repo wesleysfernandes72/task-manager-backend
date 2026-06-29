@@ -11,6 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
@@ -62,13 +66,24 @@ public class TaskServiceTest {
         task.setPriority(3);
         task.setCreatedAt(LocalDateTime.of(2026, 6, 27, 10, 0));
 
-        when(repository.findAll(any(Specification.class))).thenReturn(List.of(task));
+        Page<TaskModel> page = new PageImpl<>(List.of(task));
 
-        List<TaskResponse> result = service.findAll(new TaskSearchRequest(TaskStatus.PENDING, null));
+        when(repository.findAll(
+                any(Specification.class),
+                any(Pageable.class)
+        )).thenReturn(page);
 
-        assertEquals(1, result.size());
-        assertEquals(TaskStatus.PENDING, result.get(0).status());
-        assertEquals("Estudar Spring", result.get(0).title());
+        Page<TaskResponse> result = service.findAll(
+                new TaskSearchRequest(TaskStatus.PENDING, null),
+                PageRequest.of(0, 10)
+        );
+
+        assertEquals(1, result.getTotalElements());
+
+        TaskResponse response = result.getContent().getFirst();
+
+        assertEquals(TaskStatus.PENDING, response.status());
+        assertEquals("Estudar Spring", response.title());
     }
 
     @Test
@@ -80,12 +95,23 @@ public class TaskServiceTest {
         task.setPriority(5);
         task.setCreatedAt(LocalDateTime.of(2026, 6, 27, 11, 0));
 
-        when(repository.findAll(any(Specification.class))).thenReturn(List.of(task));
+        Page<TaskModel> page = new PageImpl<>(List.of(task));
 
-        List<TaskResponse> result = service.findAll(new TaskSearchRequest(null, 5));
+        when(repository.findAll(
+                any(Specification.class),
+                any(Pageable.class)
+        )).thenReturn(page);
 
-        assertEquals(1, result.size());
-        assertEquals(5, result.get(0).priority());
-        assertEquals(TaskStatus.DONE, result.get(0).status());
+        Page<TaskResponse> result = service.findAll(
+                new TaskSearchRequest(TaskStatus.PENDING, null),
+                PageRequest.of(0, 10)
+        );
+
+        assertEquals(1, result.getTotalElements());
+
+        TaskResponse response = result.getContent().getFirst();
+
+        assertEquals(TaskStatus.PENDING, response.status());
+        assertEquals("Estudar Spring", response.title());
     }
 }
